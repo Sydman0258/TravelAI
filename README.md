@@ -1,4 +1,4 @@
-# ✈️ TravelAI – AI-Powered Travel Itinerary Planner
+#  TravelAI – AI-Powered Travel Itinerary Planner
 
 **Portfolio project** designed to demonstrate the exact skills required for a  
 **Software Engineering Intern – AI/ML** role (Node.js, TypeScript, AI/ML, REST APIs, databases, practical AI products).
@@ -7,7 +7,7 @@ Built with a travel focus so it is especially relevant for companies like **Trav
 
 ---
 
-## ✨ What it does
+## What it does
 
 - Users enter a destination, travel dates, budget and preferences
 - The backend calls an LLM (OpenAI) to generate a detailed, day-by-day itinerary
@@ -19,7 +19,7 @@ This is a **real, working AI product**, not a toy demo.
 
 ---
 
-## 🛠 Tech Stack (maps directly to internship requirements)
+##  Tech Stack (maps directly to internship requirements)
 
 | Skill from job description                  | How this project shows it                          |
 |--------------------------------------------|----------------------------------------------------|
@@ -35,7 +35,7 @@ This is a **real, working AI product**, not a toy demo.
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 TravelAI/
@@ -59,7 +59,7 @@ TravelAI/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install dependencies
 
@@ -96,7 +96,7 @@ Open → [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint                | Description                     |
 |--------|-------------------------|---------------------------------|
@@ -125,9 +125,9 @@ Open → [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🧠 AI Design Notes (good talking points in interviews)
+## AI Design Notes 
 
-- Uses **gpt-4o-mini** for cost-effectiveness while still producing high-quality output
+- Uses **gpt-4o-mini** for cost-effectiveness while still producing high-quality output or local LLMs
 - Careful prompt engineering: structured day-by-day format, budget awareness, local tips
 - Temperature 0.7 balances creativity and reliability
 - Graceful error handling when the AI provider fails
@@ -135,7 +135,7 @@ Open → [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📈 Possible Future Improvements (shows growth mindset)
+## Possible Future Improvements 
 
 - User authentication (JWT / NextAuth)
 - Streaming responses (Server-Sent Events)
@@ -147,7 +147,7 @@ Open → [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🎯 Why this project is strong for the Travel Help internship
+## Why this project is strong for the Travel Help internship
 
 - Directly related to the travel domain
 - Shows you can ship a complete AI feature end-to-end
@@ -156,4 +156,3 @@ Open → [http://localhost:3000](http://localhost:3000)
 
 ---
 
-Made with ❤️ as a portfolio piece for AI/ML Software Engineering internships.

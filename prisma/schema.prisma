@@ -1,0 +1,23 @@
+// Prisma schema for TravelAI
+// Demonstrates database design & ORM usage
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Itinerary {
+  id          String   @id @default(uuid())
+  destination String
+  startDate   String
+  endDate     String
+  budget      Float?
+  preferences String?  // JSON string of preferences
+  content     String   // Full AI-generated itinerary (markdown)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

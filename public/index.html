@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelAI – AI Itinerary Planner</title>
+  <style>
+    :root {
+      --primary: #0ea5e9;
+      --primary-dark: #0284c7;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --success: #22c55e;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .full-width { grid-column: 1 / -1; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover { background: var(--primary-dark); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    #result {
+      display: none;
+    }
+
+    #result h2 {
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .markdown {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      max-height: 70vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .history {
+      margin-top: 2rem;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1rem;
+      background: var(--bg);
+      border-radius: 10px;
+      margin-bottom: 0.6rem;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .history-item:hover {
+      border-color: var(--primary);
+    }
+
+    .history-item span {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .error {
+      background: #7f1d1d;
+      color: #fecaca;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>✈️ TravelAI</h1>
+      <p>AI-powered personalized travel itineraries</p>
+    </header>
+
+    <div id="error" class="error"></div>
+
+    <div class="card">
+      <form id="itineraryForm">
+        <div class="form-grid">
+          <div class="full-width">
+            <label for="destination">Destination *</label>
+            <input type="text" id="destination" placeholder="e.g. Tokyo, Japan" required />
+          </div>
+
+          <div>
+            <label for="startDate">Start Date *</label>
+            <input type="date" id="startDate" required />
+          </div>
+
+          <div>
+            <label for="endDate">End Date *</label>
+            <input type="date" id="endDate" required />
+          </div>
+
+          <div>
+            <label for="budget">Budget (USD)</label>
+            <input type="number" id="budget" placeholder="e.g. 1500" min="0" />
+          </div>
+
+          <div>
+            <label for="travelStyle">Travel Style</label>
+            <select id="travelStyle">
+              <option value="">Any</option>
+              <option value="adventure">Adventure</option>
+              <option value="relaxation">Relaxation</option>
+              <option value="culture">Culture & History</option>
+              <option value="foodie">Foodie</option>
+              <option value="nightlife">Nightlife</option>
+              <option value="nature">Nature</option>
+            </select>
+          </div>
+
+          <div class="full-width">
+            <label for="interests">Interests (comma separated)</label>
+            <input type="text" id="interests" placeholder="e.g. temples, ramen, hiking, photography" />
+          </div>
+
+          <div>
+            <label for="pace">Pace</label>
+            <select id="pace">
+              <option value="moderate">Moderate</option>
+              <option value="relaxed">Relaxed</option>
+              <option value="packed">Packed</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="accommodation">Accommodation</label>
+            <select id="accommodation">
+              <option value="">Any</option>
+              <option value="hotel">Hotel</option>
+              <option value="hostel">Hostel</option>
+              <option value="airbnb">Airbnb / Apartment</option>
+              <option value="resort">Resort</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn" id="submitBtn">
+          Generate Itinerary with AI
+        </button>
+      </form>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Creating your personalized itinerary… this may take 10–20 seconds</p>
+    </div>
+
+    <div class="card" id="result">
+      <h2 id="resultTitle">Your Itinerary</h2>
+      <div class="markdown" id="itineraryContent"></div>
+      <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="resetForm()">
+        Plan Another Trip
+      </button>
+    </div>
+
+    <div class="card history">
+      <h2 style="margin-bottom: 1rem; font-size: 1.2rem;">Recent Itineraries</h2>
+      <div id="historyList">
+        <p style="color: var(--muted);">No itineraries yet. Generate one above!</p>
+      </div>
+    </div>
+
+    <footer>
+      Portfolio project • Built with TypeScript, Node.js, Express, Prisma & OpenAI or Ollama<br />
+  
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById("itineraryForm");
+    const loading = document.getElementById("loading");
+    const result = document.getElementById("result");
+    const errorBox = document.getElementById("error");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Set default dates
+    const today = new Date();
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+    document.getElementById("startDate").valueAsDate = today;
+    document.getElementById("endDate").valueAsDate = nextWeek;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.style.display = "none";
+      result.style.display = "none";
+      loading.style.display = "block";
+      submitBtn.disabled = true;
+
+      const interestsRaw = document.getElementById("interests").value;
+      const interests = interestsRaw
+        ? interestsRaw.split(",").map(s => s.trim()).filter(Boolean)
+        : [];
+
+      const payload = {
+        destination: document.getElementById("destination").value.trim(),
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        budget: document.getElementById("budget").value
+          ? Number(document.getElementById("budget").value)
+          : undefined,
+        preferences: {
+          travelStyle: document.getElementById("travelStyle").value || undefined,
+          interests: interests.length ? interests : undefined,
+          pace: document.getElementById("pace").value,
+          accommodation: document.getElementById("accommodation").value || undefined,
+        }
+      };
+
+      try {
+        const res = await fetch("/api/itineraries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || data.details || "Something went wrong");
+        }
+
+        document.getElementById("resultTitle").textContent =
+          `Itinerary for ${data.data.destination}`;
+        document.getElementById("itineraryContent").textContent = data.data.content;
+        result.style.display = "block";
+        loadHistory();
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = "block";
+      } finally {
+        loading.style.display = "none";
+        submitBtn.disabled = false;
+      }
+    });
+
+    async function loadHistory() {
+      try {
+        const res = await fetch("/api/itineraries");
+        const { data } = await res.json();
+        const list = document.getElementById("historyList");
+
+        if (!data || data.length === 0) {
+          list.innerHTML = `<p style="color: var(--muted);">No itineraries yet.</p>`;
+          return;
+        }
+
+        list.innerHTML = data.map(item => `
+          <div class="history-item" onclick="viewItinerary('${item.id}')">
+            <div>
+              <strong>${item.destination}</strong><br />
+              <span>${item.startDate} → ${item.endDate}</span>
+            </div>
+            <span>${new Date(item.createdAt).toLocaleDateString()}</span>
+          </div>
+        `).join("");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function viewItinerary(id) {
+      try {
+        const res = await fetch(`/api/itineraries/${id}`);
+        const { data } = await res.json();
+        document.getElementById("resultTitle").textContent =
+          `Itinerary for ${data.destination}`;
+        document.getElementById("itineraryContent").textContent = data.content;
+        result.style.display = "block";
+        window.scrollTo({ top: result.offsetTop - 20, behavior: "smooth" });
+      } catch (e) {
+        alert("Could not load itinerary");
+      }
+    }
+
+    function resetForm() {
+      result.style.display = "none";
+      form.reset();
+      const today = new Date();
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+      document.getElementById("startDate").valueAsDate = today;
+      document.getElementById("endDate").valueAsDate = nextWeek;
+    }
+
+    // Load history on page load
+    loadHistory();
+  </script>
+</body>
+</html>
